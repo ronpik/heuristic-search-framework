@@ -13,6 +13,7 @@ class BaseBFS(AbstractCostSearch, ABC):
         self.openlist: list = None
         self.closed: set = None
         self.parents: dict = None
+        self.reaching_costs: dict = None
 
         self.goal: SearchState = None
         self.goal_cost: float = -1
@@ -22,12 +23,12 @@ class BaseBFS(AbstractCostSearch, ABC):
 
     def search(self):
         s = self.search_space.get_initial_state()
-        self.openlist = [(0, s, None)]
+        self.openlist = [(0, s, None, 0)]
         self.parents = {}
         self.closed = set()
 
         while len(self.openlist) > 0:
-            node_cost, node, parent = heapq.heappop(self.openlist)
+            node_cost, node, parent, node_reaching_cost = heapq.heappop(self.openlist)
             node_id = node.get_id()
 
             # the cost at the first time a node is chosen for expansion, is the the lowest cost
@@ -50,9 +51,9 @@ class BaseBFS(AbstractCostSearch, ABC):
                 if child_id in self.closed:
                     continue
 
-                child_reaching_cost = node_cost + relative_cost
+                child_reaching_cost = node_reaching_cost + relative_cost
                 child_total_cost = self.evaluate_cost(child, child_reaching_cost)
-                heapq.heappush(self.openlist, (child_total_cost, child, node))
+                heapq.heappush(self.openlist, (child_total_cost, child, node, child_reaching_cost))
 
     def get_optimal_cost(self) -> float:
         return self.goal_cost

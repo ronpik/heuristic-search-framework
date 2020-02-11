@@ -78,3 +78,6 @@ class RealDistanceHeuristic(AbstractHeuristic):
     def __euclidean_distance(self, x, y):
         return euclidean_distance(x, y, self.goal_x, self.goal_y)
 
+    def __call__(self, state: RealDistanceNode) -> float:
+        return self.estimate(state)
+
