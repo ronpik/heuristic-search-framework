@@ -1,2 +1,1 @@
-from hesearch.algorithms.ucs import UniformCostSearch
-from hesearch.algorithms.a_star import AStarBFS
+from hesearch.algorithms.impl_bfs import UniformCostSearch, AStar, IDDFS, IDAStar
