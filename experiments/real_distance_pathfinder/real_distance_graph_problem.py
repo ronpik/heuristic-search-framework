@@ -2,7 +2,7 @@ from math import sqrt
 from typing import Iterable, Tuple, List
 
 from hesearch.algorithms.search import AbstractHeuristic
-from hesearch.experiments.real_distance_pathfinder.real_distance_problem_generator import \
+from experiments.real_distance_pathfinder.real_distance_problem_generator import \
     generate_real_distance_graph_problem, show_waxman_graph
 from hesearch.framework.problem import SearchSpace, SearchState
 

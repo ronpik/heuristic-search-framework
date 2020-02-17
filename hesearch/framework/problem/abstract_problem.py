@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 class SearchState(ABC):
 
     @abstractmethod
-    def get_id(self):
+    def get_id(self) -> str:
         return NotImplemented
 
     @abstractmethod

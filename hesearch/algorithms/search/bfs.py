@@ -1,5 +1,6 @@
 import heapq
 from abc import ABC
+from operator import itemgetter
 from typing import List
 
 from hesearch.algorithms.search.abc_heuristic import AbstractCostSearch
@@ -11,6 +12,7 @@ class BaseBFS(AbstractCostSearch, ABC):
     def __init__(self):
         self.search_space: SearchSpace = None
         self.openlist: list = None
+        self.num_open = 0
         self.closed: set = None
         self.parents: dict = None
         self.reaching_costs: dict = None
@@ -23,12 +25,14 @@ class BaseBFS(AbstractCostSearch, ABC):
 
     def search(self):
         s = self.search_space.get_initial_state()
-        self.openlist = [(0, s, None, 0)]
+        self.openlist = iter([(0, s, None, 0)])
+        self.num_open += 1
         self.parents = {}
         self.closed = set()
 
-        while len(self.openlist) > 0:
-            node_cost, node, parent, node_reaching_cost = heapq.heappop(self.openlist)
+        while self.num_open > 0:
+            node_cost, node, parent, node_reaching_cost = next(self.openlist)
+            self.num_open -= 1
             node_id = node.get_id()
 
             # the cost at the first time a node is chosen for expansion, is the the lowest cost
@@ -46,6 +50,7 @@ class BaseBFS(AbstractCostSearch, ABC):
             # avoiding self loops (when the child of a node is the node itself
             self.closed.add(node_id)
 
+            children_data = []
             for child, relative_cost in self.search_space.generate_children(node):
                 child_id = child.get_id()
                 if child_id in self.closed:
@@ -53,7 +58,10 @@ class BaseBFS(AbstractCostSearch, ABC):
 
                 child_reaching_cost = node_reaching_cost + relative_cost
                 child_total_cost = self.evaluate_cost(child, child_reaching_cost)
-                heapq.heappush(self.openlist, (child_total_cost, child, node, child_reaching_cost))
+                children_data.append((child_total_cost, child, node, child_reaching_cost))
+
+            self.openlist = iter(list(heapq.merge(self.openlist, children_data, key=itemgetter(0))))
+            self.num_open += len(children_data)
 
     def get_optimal_cost(self) -> float:
         return self.goal_cost
