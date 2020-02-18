@@ -1,18 +1,38 @@
 from functools import partial
+from operator import itemgetter
 from typing import Iterable, Tuple, List, Set
 
 import networkx as nx
 
 from experiments.vertex_cover import show_state, get_cover, generate_vc_problem_graph
+from experiments.vertex_cover.vertex_cover_utils import bisect_contains
 from hesearch.algorithms.search import AbstractHeuristic
 from hesearch.framework.problem import SearchState, SearchSpace
 
 
+def validate_order(it: Iterable):
+    it = iter(it)
+    try:
+        first = next(it)
+        while True:
+            try:
+                second = next(it)
+                assert(first < second)
+                first = second
+
+            except StopIteration:
+                break
+
+    except StopIteration:
+        pass
+
+
 class VertexCoverState(SearchState):
-    def __init__(self, graph: nx.Graph, vertices: Iterable[int]):
+    def __init__(self, graph: nx.Graph, vertices: Tuple[int]):
         self.graph = graph
-        self.vertices = set(vertices)
-        self.state_id = ",".join(map(str, sorted(self.vertices)))
+        self.vertices = vertices
+        validate_order(vertices)
+        self.state_id = ",".join(map(str, self.vertices))
 
     def get_id(self) -> str:
         return self.state_id
@@ -34,15 +54,17 @@ class VertexCoverProblem(SearchSpace):
         self.graph = generate_vc_problem_graph(size, difficulty, seed)
 
     def get_initial_state(self) -> VertexCoverState:
-        return VertexCoverState(self.graph, [])
+        return VertexCoverState(self.graph, tuple())
 
     def generate_children(self, state: VertexCoverState) -> Iterable[Tuple[VertexCoverState, float]]:
+        state_max_vertex = max(state.vertices) if state.vertices else -1
         residual_vertices = self.__get_residual_vertices(state.vertices)
         for v in residual_vertices:
-            yield VertexCoverState(self.graph, state.vertices.union([v])), 1
+            if v > state_max_vertex:
+                yield VertexCoverState(self.graph, state.vertices + (v,)), 1
 
-    def __get_residual_vertices(self, vertices: Set[int]):
-        residual = [n for n in self.graph.nodes if n not in vertices]
+    def __get_residual_vertices(self, vertices: Tuple[int]):
+        residual = [n for n in self.graph.nodes if not bisect_contains(vertices, n)]
         return residual
 
     def is_goal(self, state: VertexCoverState) -> bool:
@@ -54,6 +76,8 @@ class VertexCoverProblem(SearchSpace):
 class VertexCoverHeuristic(AbstractHeuristic):
     def __init__(self, vc_problem: VertexCoverProblem):
         self.vc_problem = vc_problem
+
+        self.min_value = float('inf')
 
     @property
     def graph(self) -> nx.Graph:
@@ -67,16 +91,28 @@ class VertexCoverHeuristic(AbstractHeuristic):
         calc_res_degree = partial(self.__residual_degree, covered_edges=covered_edges)
 
         residual_vertices = [n for n in self.graph.nodes() if n not in state.vertices]
-        residual_degrees = sorted(map(calc_res_degree, residual_vertices), reverse=True)
+        # residual_degrees = sorted(map(calc_res_degree, residual_vertices), reverse=True)
 
+
+        residual_vertices = sorted(zip(residual_vertices, map(calc_res_degree, residual_vertices)), key=itemgetter(1), reverse=True)
+        h_vertices = set()
         h = 0
         num_not_covered = self.graph.number_of_edges() - len(covered_edges)
-        for d in residual_degrees:
+        for v, d in residual_vertices:
+            for n in self.graph.neighbors(v):
+                if n in h_vertices:
+                    d -= 1
+                    break
+
+            h_vertices.add(v)
             h += 1
             num_not_covered -= d
             if num_not_covered <= 0:
                 break
 
+        if h < self.min_value:
+            self.min_value = h
+            print(h)
         return h
 
     def __residual_degree(self, v: int, covered_edges: Set[Tuple[int, int]]):

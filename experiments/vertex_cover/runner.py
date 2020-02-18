@@ -14,7 +14,7 @@ if __name__ == "__main__":
     problem = VertexCoverProblem(size=problem_size, difficulty=0.9, seed=random_seed)
     heuristic = VertexCoverHeuristic(problem)
     search_algos.append(AStar(heuristic))
-    # search_algos.append(IDAStar(heuristic))
+    search_algos.append(IDAStar(heuristic))
 
     for solver in search_algos:
 

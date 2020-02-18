@@ -1,10 +1,21 @@
 import heapq
 from abc import ABC
 from operator import itemgetter
-from typing import List
+from typing import List, NamedTuple
 
 from hesearch.algorithms.search.abc_heuristic import AbstractCostSearch
 from hesearch.framework.problem import SearchState, SearchSpace
+
+
+ROOT_REACH_COST = 0
+
+
+class OpenNode(NamedTuple):
+    node_cost: float
+    node: SearchState
+    parent: SearchState
+    node_reaching_cost: float
+    depth: int
 
 
 class BaseBFS(AbstractCostSearch, ABC):
@@ -24,41 +35,44 @@ class BaseBFS(AbstractCostSearch, ABC):
         self.search_space = search_space
 
     def search(self):
-        s = self.search_space.get_initial_state()
-        self.openlist = iter([(0, s, None, 0)])
+        root = self.search_space.get_initial_state()
+        s_cost = self.evaluate_cost(root, ROOT_REACH_COST)
+        root = OpenNode(node_cost=s_cost, node=root, parent=None, node_reaching_cost=ROOT_REACH_COST, depth=0)
+        self.openlist = iter([root])
         self.num_open += 1
         self.parents = {}
         self.closed = set()
 
         while self.num_open > 0:
-            node_cost, node, parent, node_reaching_cost = next(self.openlist)
+            best = next(self.openlist)
             self.num_open -= 1
-            node_id = node.get_id()
+            best_id = best.node.get_id()
 
             # the cost at the first time a node is chosen for expansion, is the the lowest cost
             # and the path corresponding to this cost is the optimal path to this node
-            self.parents[node_id] = parent
+            self.parents[best_id] = best.parent
 
-            if self.search_space.is_goal(node):
-                self.goal = node
-                self.goal_cost = node_cost
+            if self.search_space.is_goal(best.node):
+                self.goal = best.node
+                self.goal_cost = best.node_cost
                 return
 
-            if node_id in self.closed:
+            if best_id in self.closed:
                 continue
 
             # avoiding self loops (when the child of a node is the node itself
-            self.closed.add(node_id)
-
+            self.closed.add(best_id)
+            children_depth = best.depth + 1
             children_data = []
-            for child, relative_cost in self.search_space.generate_children(node):
+            for child, relative_cost in self.search_space.generate_children(best.node):
                 child_id = child.get_id()
                 if child_id in self.closed:
                     continue
 
-                child_reaching_cost = node_reaching_cost + relative_cost
+                child_reaching_cost = best.node_reaching_cost + relative_cost
                 child_total_cost = self.evaluate_cost(child, child_reaching_cost)
-                children_data.append((child_total_cost, child, node, child_reaching_cost))
+                open_child = OpenNode(node_cost=child_total_cost, node=child, parent=best.node, node_reaching_cost=child_reaching_cost, depth=children_depth)
+                children_data.append(open_child)
 
             self.openlist = iter(list(heapq.merge(self.openlist, children_data, key=itemgetter(0))))
             self.num_open += len(children_data)
