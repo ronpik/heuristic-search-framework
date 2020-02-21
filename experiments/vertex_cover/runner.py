@@ -4,7 +4,7 @@ from hesearch.framework.analysis.problem_analysis import SearchSpaceAnalysisWrap
 
 if __name__ == "__main__":
 
-    problem_size = 20
+    problem_size = 25
     random_seed = 71070
 
     search_algos = []

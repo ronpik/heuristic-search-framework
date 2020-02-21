@@ -24,6 +24,8 @@ class SearchSpaceAnalysisWrapper(SearchSpace):
         self.min_generation_time = None
         self.num_steps = 0
 
+        # TODO measure time
+
     def generate_children(self, state: SearchState) -> Iterable[Tuple[SearchState, float]]:
         children = self.search_space.generate_children(state)
         for c, cost in children:

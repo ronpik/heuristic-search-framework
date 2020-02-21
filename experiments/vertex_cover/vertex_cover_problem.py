@@ -99,14 +99,17 @@ class VertexCoverHeuristic(AbstractHeuristic):
         h = 0
         num_not_covered = self.graph.number_of_edges() - len(covered_edges)
         for v, d in residual_vertices:
+            if d == 0:
+                break
+
+            num_reduced = 0
             for n in self.graph.neighbors(v):
                 if n in h_vertices:
-                    d -= 1
-                    break
+                    num_reduced += 1
 
             h_vertices.add(v)
-            h += 1
-            num_not_covered -= d
+            h += 1 - (float(num_reduced) / d)
+            num_not_covered -= (d - num_reduced)
             if num_not_covered <= 0:
                 break
 
