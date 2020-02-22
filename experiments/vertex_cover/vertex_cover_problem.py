@@ -6,7 +6,7 @@ import networkx as nx
 
 from experiments.vertex_cover import show_state, get_cover, generate_vc_problem_graph
 from experiments.vertex_cover.vertex_cover_utils import bisect_contains
-from hesearch.algorithms.search import AbstractHeuristic
+from hesearch.algorithms.search import HeuristicEstimator
 from hesearch.framework.problem import SearchState, SearchSpace
 
 
@@ -73,7 +73,7 @@ class VertexCoverProblem(SearchSpace):
         return num_not_covered == 0
 
 
-class VertexCoverHeuristic(AbstractHeuristic):
+class VertexCoverHeuristicEstimator(HeuristicEstimator):
     def __init__(self, vc_problem: VertexCoverProblem):
         self.vc_problem = vc_problem
 

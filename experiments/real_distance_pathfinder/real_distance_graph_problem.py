@@ -1,7 +1,7 @@
 from math import sqrt
 from typing import Iterable, Tuple, List
 
-from hesearch.algorithms.search import AbstractHeuristic
+from hesearch.algorithms.search import HeuristicEstimator
 from experiments.real_distance_pathfinder.real_distance_problem_generator import \
     generate_real_distance_graph_problem, show_waxman_graph
 from hesearch.framework.problem import SearchSpace, SearchState
@@ -67,7 +67,7 @@ class RealDistanceGraphProblem(SearchSpace):
         show_waxman_graph(self.graph, self.source.name, self.goal.name, optimal_path)
 
 
-class RealDistanceHeuristic(AbstractHeuristic):
+class RealDistanceHeuristicEstimator(HeuristicEstimator):
     def __init__(self, real_distance_problem: RealDistanceGraphProblem):
         self.goal_pos = real_distance_problem.get_goal().position
         self.goal_x, self.goal_y = self.goal_pos

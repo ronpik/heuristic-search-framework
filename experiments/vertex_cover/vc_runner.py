@@ -1,4 +1,4 @@
-from experiments.vertex_cover import VertexCoverProblem, VertexCoverHeuristic
+from experiments.vertex_cover import VertexCoverProblem, VertexCoverHeuristicEstimator
 from hesearch.algorithms import UniformCostSearch, AStar, IDAStar
 from hesearch.framework.analysis.problem_analysis import SearchSpaceAnalysisWrapper
 
@@ -12,7 +12,7 @@ if __name__ == "__main__":
     # search_algos.append(IDDFS())
 
     problem = VertexCoverProblem(size=problem_size, difficulty=0.9, seed=random_seed)
-    heuristic = VertexCoverHeuristic(problem)
+    heuristic = VertexCoverHeuristicEstimator(problem)
     search_algos.append(AStar(heuristic))
     search_algos.append(IDAStar(heuristic))
 

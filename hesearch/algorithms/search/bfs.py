@@ -3,11 +3,11 @@ from abc import ABC
 from operator import itemgetter
 from typing import List, NamedTuple
 
-from hesearch.algorithms.search.abc_heuristic import AbstractCostSearch
+from hesearch.algorithms.search.abc_heuristic import CostSearcher, StateContext
 from hesearch.framework.problem import SearchState, SearchSpace
 
 
-ROOT_REACH_COST = 0
+ROOT_REACH_COST = 0.0
 
 
 class OpenNode(NamedTuple):
@@ -18,7 +18,7 @@ class OpenNode(NamedTuple):
     depth: int
 
 
-class BaseBFS(AbstractCostSearch, ABC):
+class BaseBFS(CostSearcher, ABC):
 
     def __init__(self):
         self.search_space: SearchSpace = None
@@ -36,7 +36,8 @@ class BaseBFS(AbstractCostSearch, ABC):
 
     def search(self):
         root = self.search_space.get_initial_state()
-        s_cost = self.evaluate_cost(root, ROOT_REACH_COST)
+        root_context = StateContext(root, depth=0, reaching_cost=ROOT_REACH_COST)
+        s_cost = self.evaluate_cost(root_context)
         root = OpenNode(node_cost=s_cost, node=root, parent=None, node_reaching_cost=ROOT_REACH_COST, depth=0)
         self.openlist = iter([root])
         self.num_open += 1
@@ -70,7 +71,8 @@ class BaseBFS(AbstractCostSearch, ABC):
                     continue
 
                 child_reaching_cost = best.node_reaching_cost + relative_cost
-                child_total_cost = self.evaluate_cost(child, child_reaching_cost)
+                child_context = StateContext(child, children_depth, child_reaching_cost)
+                child_total_cost = self.evaluate_cost(child_context)
                 open_child = OpenNode(node_cost=child_total_cost, node=child, parent=best.node, node_reaching_cost=child_reaching_cost, depth=children_depth)
                 children_data.append(open_child)
 

@@ -6,7 +6,7 @@ from typing import Sequence, Iterable, Tuple
 import numpy as np
 
 
-from hesearch.algorithms.search import AbstractHeuristic
+from hesearch.algorithms.search import HeuristicEstimator
 from hesearch.framework.problem import SearchState, SearchSpace
 
 
@@ -124,14 +124,11 @@ class NPuzzleProblem(SearchSpace):
         return all(starmap(eq, zip(range(self.num_tiles), state.tiles)))
 
 
-class NPuzzleManhattanDistanceHeuristic(AbstractHeuristic):
+class NPuzzleManhattanDistanceHeuristicEstimator(HeuristicEstimator):
 
     def __init__(self, nsize: int):
         self.n = nsize
         self.goal = NPuzzleState.get_goal_state(nsize)
-
-    def __call__(self, state: NPuzzleState):
-        return self.estimate(state)
 
     def estimate(self, state: NPuzzleState) -> float:
         sum_distances = 0

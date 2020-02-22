@@ -1,19 +1,19 @@
-from experiments.n_puzzle.npuzzle_problem import NPuzzleProblem, NPuzzleManhattanDistanceHeuristic
+from experiments.n_puzzle.npuzzle_problem import NPuzzleProblem, NPuzzleManhattanDistanceHeuristicEstimator
 from hesearch.algorithms import UniformCostSearch, AStar, IDAStar
 from hesearch.framework.analysis.problem_analysis import SearchSpaceAnalysisWrapper
 
 if __name__ == "__main__":
 
-    n = 5
+    n = 4
     random_seed = 71070
-    optimal_steps = 100
+    optimal_steps = 50
 
     search_algos = []
     # search_algos.append(UniformCostSearch())
     # search_algos.append(IDDFS())
 
     problem = NPuzzleProblem(n, seed=random_seed, optimal_depth=optimal_steps)
-    heuristic = NPuzzleManhattanDistanceHeuristic(n)
+    heuristic = NPuzzleManhattanDistanceHeuristicEstimator(n)
     search_algos.append(AStar(heuristic))
     search_algos.append(IDAStar(heuristic))
 

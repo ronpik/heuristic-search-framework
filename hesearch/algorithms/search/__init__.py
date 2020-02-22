@@ -1,1 +1,1 @@
-from hesearch.algorithms.search.abc_heuristic import AbstractHeuristic
+from hesearch.algorithms.search.abc_heuristic import HeuristicEstimator

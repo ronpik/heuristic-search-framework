@@ -1,18 +1,18 @@
 from abc import ABC
 from typing import List
 
-from hesearch.algorithms.search.abc_heuristic import AbstractCostSearch
+from hesearch.algorithms.search.abc_heuristic import CostSearcher, StateContext
 from hesearch.framework.problem import SearchState, SearchSpace
 
 FOUND_FLAG = -1
-ROOT_REACH_COST = 0
+ROOT_REACH_COST = 0.0
 INFINITE_COST = float('inf')
 
 
 # class AbstractDLS(ABC):
 
 
-class BaseIterativeDeepening(AbstractCostSearch, ABC):
+class BaseIterativeDeepening(CostSearcher, ABC):
 
     def __init__(self, ):
         self.search_space: SearchSpace = None
@@ -25,7 +25,8 @@ class BaseIterativeDeepening(AbstractCostSearch, ABC):
 
     def search(self):
         root = self.search_space.get_initial_state()
-        bound = self.evaluate_cost(root, ROOT_REACH_COST)
+        root_context = StateContext(root, depth=0, reaching_cost=ROOT_REACH_COST)
+        bound = self.evaluate_cost(root_context)
         path_stack = [root]
 
         while True:
@@ -43,7 +44,8 @@ class BaseIterativeDeepening(AbstractCostSearch, ABC):
 
     def search_dls(self, path_stack: list, reaching_cost: float, bound: float) -> float:
         node = path_stack[-1]
-        node_cost = self.evaluate_cost(node, reaching_cost)
+        node_context = StateContext(node, depth=len(path_stack) - 1, reaching_cost=reaching_cost)
+        node_cost = self.evaluate_cost(node_context)
         if node_cost > bound:
             return node_cost
 

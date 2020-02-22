@@ -2,7 +2,7 @@ from operator import itemgetter
 
 from hesearch.algorithms import UniformCostSearch
 from hesearch.algorithms.impl_bfs import AStar, IDDFS, IDAStar
-from experiments.real_distance_pathfinder import RealDistanceGraphProblem, RealDistanceHeuristic
+from experiments.real_distance_pathfinder import RealDistanceGraphProblem, RealDistanceHeuristicEstimator
 from hesearch.framework.analysis.problem_analysis import SearchSpaceAnalysisWrapper
 
 if __name__ == "__main__":
@@ -15,7 +15,7 @@ if __name__ == "__main__":
     # search_algos.append(IDDFS())
 
     problem = RealDistanceGraphProblem(size=problem_size, seed=random_seed)
-    heuristic = RealDistanceHeuristic(problem)
+    heuristic = RealDistanceHeuristicEstimator(problem)
     search_algos.append(AStar(heuristic))
     # search_algos.append(IDAStar(heuristic))
 
