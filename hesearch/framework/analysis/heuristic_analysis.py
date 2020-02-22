@@ -15,7 +15,8 @@ class HeuristicEstimatorAnalysisWrapper(HeuristicEstimator):
 
     def estimate(self, state: SearchState) -> float:
         h = self.heuristic.estimate(state)
-        self.index_info(h, state)
+        self.__index_info(h, state)
+        return h
 
-    def index_info(self, heuristic_value: float, state: SearchState):
+    def __index_info(self, heuristic_value: float, state: SearchState):
         pass

@@ -1,15 +1,16 @@
 from typing import List
 
-from hesearch.algorithms.search.abc_heuristic import CostSearcher
+from hesearch.algorithms.search.abc_heuristic import CostSearcher, StateContext, HeuristicEstimator
 from hesearch.framework.problem import SearchState, SearchSpace
 
 
-class CostSearchanalyzer(CostSearcher):
+class CostSearchAnalyzer(CostSearcher):
 
-    def __init__(self, cost_search_algo: CostSearcher):
+    def __init__(self, cost_search_algo: CostSearcher, heuristic: HeuristicEstimator):
         self.searcher = cost_search_algo
+        self.heuristic = heuristic
 
-    def evaluate_cost(self, state: SearchState, state_cost: float) -> float:
+    def evaluate_cost(self, state_context: StateContext) -> float:
         pass
 
 
