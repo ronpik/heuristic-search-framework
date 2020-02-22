@@ -5,6 +5,7 @@ from hesearch.algorithms.search import HeuristicEstimator
 from hesearch.algorithms.search.abc_heuristic import StateContext, HeuristicCostSearcher
 from hesearch.algorithms.search.bfs import BaseBFS
 from hesearch.algorithms.search.iterative_deepening import BaseIterativeDeepening
+from hesearch.framework.analysis.cost_search_analyzer import HeuristicCostSearchAnalyzer
 from hesearch.framework.problem import SearchSpace, SearchState
 
 
@@ -55,3 +56,14 @@ class IDAStar(BaseIterativeDeepening, HeuristicCostSearcher):
     def evaluate_heuristic_cost(self, state_context: StateContext, heuristic_value: float) -> float:
         return basic_heuristic_cost(state_context.reaching_cost, heuristic_value)
 
+
+class HeuristicBFSCostSearchAnalyzer(BaseBFS, HeuristicCostSearchAnalyzer):
+    def __init__(self, cost_search_algo: HeuristicCostSearcher, name: str):
+        BaseBFS.__init__(self)
+        HeuristicCostSearchAnalyzer.__init__(self, cost_search_algo, name)
+
+
+class HeuristicIDCostSearchAnalyzer(BaseIterativeDeepening, HeuristicCostSearchAnalyzer):
+    def __init__(self, cost_search_algo: HeuristicCostSearcher, name: str):
+        BaseIterativeDeepening.__init__(self)
+        HeuristicCostSearchAnalyzer.__init__(self, cost_search_algo, name)

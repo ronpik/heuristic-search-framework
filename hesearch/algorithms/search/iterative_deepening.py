@@ -14,7 +14,7 @@ INFINITE_COST = float('inf')
 
 class BaseIterativeDeepening(CostSearcher, ABC):
 
-    def __init__(self, ):
+    def __init__(self):
         self.search_space: SearchSpace = None
 
         self.optimal_goal_cost: float = -1

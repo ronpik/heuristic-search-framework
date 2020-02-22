@@ -1,5 +1,6 @@
 from experiments.n_puzzle.npuzzle_problem import NPuzzleProblem, NPuzzleManhattanDistanceHeuristicEstimator
 from hesearch.algorithms import UniformCostSearch, AStar, IDAStar
+from hesearch.algorithms.impl_bfs import HeuristicBFSCostSearchAnalyzer, HeuristicIDCostSearchAnalyzer
 from hesearch.framework.analysis.problem_analysis import SearchSpaceAnalysisWrapper
 
 if __name__ == "__main__":
@@ -14,8 +15,13 @@ if __name__ == "__main__":
 
     problem = NPuzzleProblem(n, seed=random_seed, optimal_depth=optimal_steps)
     heuristic = NPuzzleManhattanDistanceHeuristicEstimator(n)
-    search_algos.append(AStar(heuristic))
-    search_algos.append(IDAStar(heuristic))
+    astar = AStar(heuristic)
+    astar = HeuristicBFSCostSearchAnalyzer(astar, "n_puzzle-astar")
+    search_algos.append(astar)
+
+    ida_star = IDAStar(heuristic)
+    ida_star = HeuristicIDCostSearchAnalyzer(ida_star, "4_puzzle-ida_star")
+    search_algos.append(ida_star)
 
     for solver in search_algos:
 
