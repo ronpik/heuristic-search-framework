@@ -7,7 +7,7 @@ if __name__ == "__main__":
 
     n = 4
     random_seed = 71070
-    optimal_steps = 50
+    optimal_steps = 100
 
     search_algos = []
     # search_algos.append(UniformCostSearch())
@@ -17,10 +17,10 @@ if __name__ == "__main__":
     heuristic = NPuzzleManhattanDistanceHeuristicEstimator(n)
     astar = AStar(heuristic)
     astar = HeuristicBFSCostSearchAnalyzer(astar, "n_puzzle-astar")
-    search_algos.append(astar)
+    # search_algos.append(astar)
 
     ida_star = IDAStar(heuristic)
-    ida_star = HeuristicIDCostSearchAnalyzer(ida_star, "4_puzzle-ida_star")
+    ida_star = HeuristicIDCostSearchAnalyzer(ida_star, "4_puzzle-ida_star3")
     search_algos.append(ida_star)
 
     for solver in search_algos:
