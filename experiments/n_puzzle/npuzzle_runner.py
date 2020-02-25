@@ -1,32 +1,39 @@
+import random
+
 from experiments.n_puzzle.npuzzle_problem import NPuzzleProblem, NPuzzleManhattanDistanceHeuristicEstimator
-from hesearch.algorithms import UniformCostSearch, AStar, IDAStar
-from hesearch.algorithms.impl_bfs import HeuristicBFSCostSearchAnalyzer, HeuristicIDCostSearchAnalyzer
-from hesearch.framework.analysis.problem_analysis import SearchSpaceAnalysisWrapper
+from hesearch.algorithms import AStar, IDAStar
+
+from hesearch.framework.analysis import SearchSpaceAnalysisWrapper, HeuristicBFSCostSearchAnalyzer, \
+    HeuristicIDCostSearchAnalyzer
 
 if __name__ == "__main__":
 
     n = 4
     random_seed = 71070
-    optimal_steps = 100
+    max_permutation_steps = 150
+
+    # r = random.Random(random_seed)
+    permutation_steps = random.randint(0, max_permutation_steps)
+    print(f"permutaion_steps: {permutation_steps}")
 
     search_algos = []
     # search_algos.append(UniformCostSearch())
     # search_algos.append(IDDFS())
 
-    problem = NPuzzleProblem(n, seed=random_seed, optimal_depth=optimal_steps)
+    problem = NPuzzleProblem(n, seed=random_seed, optimal_depth=permutation_steps)
     heuristic = NPuzzleManhattanDistanceHeuristicEstimator(n)
     astar = AStar(heuristic)
-    astar = HeuristicBFSCostSearchAnalyzer(astar, "n_puzzle-astar")
+    astar = HeuristicBFSCostSearchAnalyzer(astar, "./analysis-results/n_puzzle-astar")
     # search_algos.append(astar)
 
     ida_star = IDAStar(heuristic)
-    ida_star = HeuristicIDCostSearchAnalyzer(ida_star, "4_puzzle-ida_star3")
+    ida_star = HeuristicIDCostSearchAnalyzer(ida_star, f"./analysis-results/4_puzzle-ida_star-{permutation_steps}_steps")
     search_algos.append(ida_star)
 
     for solver in search_algos:
 
         # initialize search space
-        problem = NPuzzleProblem(n, seed=random_seed, optimal_depth=optimal_steps)
+        problem = NPuzzleProblem(n, seed=random_seed, optimal_depth=permutation_steps)
         problem_analyzer = SearchSpaceAnalysisWrapper(problem)
 
         print(f"\nSearch optimal path using {solver.__class__}")

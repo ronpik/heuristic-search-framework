@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import List
 
 from hesearch.algorithms.search.abc_heuristic import CostSearcher, StateContext
@@ -9,9 +9,6 @@ ROOT_REACH_COST = 0.0
 INFINITE_COST = float('inf')
 
 
-# class AbstractDLS(ABC):
-
-
 class BaseIterativeDeepening(CostSearcher, ABC):
 
     def __init__(self):
@@ -20,7 +17,8 @@ class BaseIterativeDeepening(CostSearcher, ABC):
         self.optimal_goal_cost: float = -1
         self.optimal_path: List[SearchState] = None
 
-        self.bound = 0
+        self.bound: float = 0.0
+        self.min_above_bound = 0.0
 
     def set_search_space(self, search_space: SearchSpace):
         self.search_space = search_space
@@ -42,7 +40,8 @@ class BaseIterativeDeepening(CostSearcher, ABC):
             if next_bound == INFINITE_COST:
                 return None
 
-            self.bound = next_bound
+            self.min_above_bound = next_bound
+            self.bound = self._calculate_next_bound()
 
     def search_dls(self, path_stack: list, reaching_cost: float, bound: float) -> float:
         """
@@ -61,19 +60,22 @@ class BaseIterativeDeepening(CostSearcher, ABC):
         if self.search_space.is_goal(node):
             return FOUND_FLAG
 
-        min_cost_exceeds = INFINITE_COST
+        min_above_bound = INFINITE_COST
         for child, relative_cost in self.search_space.generate_children(node):
             if child not in path_stack:
                 path_stack.append(child)
                 child_reaching_cost = reaching_cost + relative_cost
-                child_min_cost_exceeds = self.search_dls(path_stack, child_reaching_cost, bound)
-                if child_min_cost_exceeds == FOUND_FLAG:
+                child_min_above_bound = self.search_dls(path_stack, child_reaching_cost, bound)
+                if child_min_above_bound == FOUND_FLAG:
                     return FOUND_FLAG
 
-                min_cost_exceeds = min(min_cost_exceeds, child_min_cost_exceeds)
+                min_above_bound = min(min_above_bound, child_min_above_bound)
                 path_stack.pop()
 
-        return min_cost_exceeds
+        return min_above_bound
+
+    def _calculate_next_bound(self) -> float:
+        return self.min_above_bound
 
     def get_optimal_cost(self) -> float:
         return self.optimal_goal_cost
